@@ -9,13 +9,13 @@ from rl import *
 
 LEARN_FREQ = 5  # training frequency
 MEMORY_SIZE = 200000
-MEMORY_WARMUP_SIZE = 200
+MEMORY_WARMUP_SIZE = 256
 BATCH_SIZE = 64
 LEARNING_RATE = 0.0005
 GAMMA = 0.99
-TRAIN_EPISODE = 100000
-EVAL_PERIOD = 50
-SAVE_PERIOD = 500
+TRAIN_EPISODE = 1000000
+EVAL_PERIOD = 100
+SAVE_PERIOD = 1000
 MODEL_DIR = "models"
 
 
@@ -40,6 +40,9 @@ def train_episode(agent: CatAgent, env: TrainableGame, rpm: ReplayMemory):
 
         if terminal:
             break
+
+    if total_reward >= env.win_reward() * 0.9:
+        env.increase_difficulty()
 
     return total_reward
 

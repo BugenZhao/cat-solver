@@ -44,8 +44,10 @@ def load_model(path: Union[str, None], gamma: float = 1.0, lr: float = 0.0) -> T
     agent = CatAgent(alg, act_dim)
 
     if path is not None:
+        # trained
         agent.restore(path)
         agent.e_greed = 0.0
+        env.difficulty_hard()
 
     return agent, env
 
