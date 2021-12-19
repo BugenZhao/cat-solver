@@ -1,5 +1,7 @@
 import logging
-from game.trainable import Reward, TrainableGame
+import os
+from eval import eval_episode
+from game.trainable import TrainableGame
 import numpy as np
 from logging import info
 from rl import *
@@ -13,11 +15,12 @@ BATCH_SIZE = 64
 LEARNING_RATE = 0.0005
 GAMMA = 0.99
 TRAIN_EPISODE = 100000
+EVAL_PERIOD = 50
+SAVE_PERIOD = 500
+MODEL_DIR = "models"
 
-Env = TrainableGame
 
-
-def train_episode(agent: CatAgent, env: Env, rpm: ReplayMemory):
+def train_episode(agent: CatAgent, env: TrainableGame, rpm: ReplayMemory):
     env.reset()
     total_reward = 0
     step = 0
@@ -41,26 +44,9 @@ def train_episode(agent: CatAgent, env: Env, rpm: ReplayMemory):
     return total_reward
 
 
-def eval_episode(agent: CatAgent, env: Env, episodes: int = 5) -> Reward:
-    rewards = []
-    for _ in range(episodes):
-        env.reset()
-        episode_reward = 0
-
-        while True:
-            obs = env.get_obs()
-            action = agent.predict(obs)
-            reward, _, terminal = env.step(action)
-            episode_reward += reward
-            if terminal:
-                break
-
-        rewards.append(episode_reward)
-    return np.mean(rewards)
-
-
 def train():
-    env = Env()
+    os.makedirs(MODEL_DIR)
+    env = TrainableGame()
     obs_dim = env.obs_dim()
     act_dim = env.act_dim()
 
@@ -73,11 +59,11 @@ def train():
     while len(rpm) < MEMORY_WARMUP_SIZE:
         train_episode(agent, env, rpm)
 
-    episode = 0
-    while episode < TRAIN_EPISODE:
-        for _ in range(50):
-            _reward = train_episode(agent, env, rpm)
-            episode += 1
-
-        eval_reward = eval_episode(agent, env)
-        info(f'episode {episode}, eval_reward {eval_reward}')
+    for episode in range(TRAIN_EPISODE + 1):
+        _reward = train_episode(agent, env, rpm)
+        if episode % EVAL_PERIOD == 0:
+            eval_reward = eval_episode(agent, env)
+            info(f'episode {episode}, eval_reward {eval_reward}')
+        if episode % SAVE_PERIOD == 0:
+            agent.save(os.sep.join(
+                [MODEL_DIR, f'e_{episode}_r_{eval_reward}.model']))

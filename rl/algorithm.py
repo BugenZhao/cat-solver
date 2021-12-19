@@ -1,3 +1,4 @@
+from typing import Union
 from rl.model import CatModel
 import torch
 import torch.nn as nn
@@ -7,12 +8,13 @@ from copy import deepcopy
 
 
 class DQN:
-    def __init__(self, model: CatModel, gamma: float, lr: float):
+    def __init__(self, model: CatModel, gamma: float = 1.0, lr: float = 0.0):
         self.model = model
         self.target_model = deepcopy(model)
-        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.model.to(device)
-        self.target_model.to(device)
+        self.device = torch.device(
+            "cuda" if torch.cuda.is_available() else "cpu")
+        self.model.to(self.device)
+        self.target_model.to(self.device)
 
         self.gamma = gamma
         self.lr = lr

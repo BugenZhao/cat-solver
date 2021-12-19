@@ -1,4 +1,6 @@
 from typing import Tuple
+
+from numpy.lib.function_base import disp
 from .core import GameCore, Result
 import numpy as np
 
@@ -28,7 +30,7 @@ class TrainableGame:
     def reset(self):
         self.game = GameCore(self.n, self.n, self.n - 3)
 
-    def step(self, action: Act) -> Tuple[Reward, Obs, bool]:
+    def step(self, action: Act, display: bool = False) -> Tuple[Reward, Obs, bool]:
         action = Act(action)
         i = action // self.n
         j = action % self.n
@@ -46,4 +48,10 @@ class TrainableGame:
         elif self.game.result == Result.WIN:
             reward += 100
 
+        if display:
+            print(self.game.result.name)
+
         return reward, next_obs, terminal
+
+    def print(self):
+        self.game.print_state()

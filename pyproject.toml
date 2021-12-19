@@ -26,3 +26,4 @@ build-backend = "pdm.pep517.api"
 [tool.pdm.scripts]
 play = {call = "play:play"}
 train = {call = "train:train"}
+eval = {call = "eval:eval"}

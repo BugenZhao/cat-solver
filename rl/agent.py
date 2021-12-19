@@ -46,3 +46,10 @@ class CatAgent:
 
         loss = self.alg.learn(obs, act, reward, next_obs, terminal)
         return loss
+
+    def save(self, save_path: str):
+        torch.save(self.alg.model.state_dict(), save_path)
+
+    def restore(self, save_path: str):
+        checkpoint = torch.load(save_path, map_location=self.alg.device)
+        self.alg.model.load_state_dict(checkpoint)
