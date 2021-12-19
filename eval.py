@@ -66,3 +66,7 @@ def eval():
     while True:
         eval_episode(agent, env, episodes=1, display=True)
         input('> next?')
+
+
+if __name__ == '__main__':
+    eval()

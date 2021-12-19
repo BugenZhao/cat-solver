@@ -7,8 +7,6 @@ import numpy as np
 from logging import info
 from rl import *
 
-logging.basicConfig(level="INFO")
-
 LEARN_FREQ = 5  # training frequency
 MEMORY_SIZE = 200000
 MEMORY_WARMUP_SIZE = 200
@@ -47,6 +45,7 @@ def train_episode(agent: CatAgent, env: TrainableGame, rpm: ReplayMemory):
 
 
 def train():
+    logging.basicConfig(level="INFO")
     os.makedirs(MODEL_DIR, exist_ok=True)
 
     checkpoint_path = sys.argv[1] if len(sys.argv) == 2 else None
@@ -64,3 +63,7 @@ def train():
         if episode % SAVE_PERIOD == 0:
             agent.save(os.sep.join(
                 [MODEL_DIR, f'e_{episode}_r_{eval_reward}.model']))
+
+
+if __name__ == '__main__':
+    train()
