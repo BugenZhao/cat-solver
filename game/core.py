@@ -67,6 +67,9 @@ class GameCore:
     def get_block(self, coord: Coord) -> Block:
         return self.state[coord[0]][coord[1]]
 
+    def is_wall(self, coord: Coord) -> bool:
+        return self.get_block(coord) == Block.WALL
+
     def is_valid_coord(self, coord: Coord) -> bool:
         return 0 <= coord[0] < self.height and 0 <= coord[1] < self.width
 
@@ -87,18 +90,13 @@ class GameCore:
 
         neighbors = list(filter(self.is_valid_coord, [
                          left, top_left, top_right, right, bottom_right, bottom_left]))
-        random.shuffle(neighbors)
         return neighbors
 
     def cat_neighbors(self) -> list[Coord]:
         return self.neighbors(self.cat)
 
     def step_cat(self) -> None:
-        distances = self.distances_to_edge()
-        neighbors = filter(
-            lambda coord: distances[coord[0]][coord[1]] is not None, self.cat_neighbors())
-        next = min(
-            neighbors, key=lambda coord: distances[coord[0]][coord[1]], default=None)
+        next = self.find_cat_next()
 
         if next is None:
             self.result = Result.WIN
@@ -141,7 +139,7 @@ class GameCore:
                      for _ in range(self.width)]
 
         def may_update(coord: Coord, new_dist: int = 0):
-            if self.get_block(coord) == Block.WALL:
+            if self.is_wall(coord):
                 return
             dist = distances[coord[0]][coord[1]]
             if dist is None or dist > new_dist:
@@ -163,6 +161,46 @@ class GameCore:
                 may_update(neighbor, dist + 1)
 
         return distances
+
+    def find_cat_next(self) -> Union[Coord, None]:
+        distances = self.distances_to_edge()
+
+        route_counts = [[None for _ in range(self.height)]
+                        for _ in range(self.width)]
+
+        def route_count(coord: Coord) -> int:
+            if self.is_edge_coord(coord):
+                return 1
+            memo = route_counts[coord[0]][coord[1]]
+            if memo is not None:
+                return memo
+            dist = distances[coord[0]][coord[1]]
+            if dist is None:
+                return 0
+
+            sum = 0
+            for neighbor in self.neighbors(coord):
+                neighbor_dist = distances[neighbor[0]][neighbor[1]]
+                if neighbor_dist is None:
+                    continue
+                if neighbor_dist < dist:
+                    sum += route_count(neighbor)
+
+            route_counts[coord[0]][coord[1]] = sum
+            return sum
+
+        cat_dist = distances[self.cat[0]][self.cat[1]]
+
+        def is_better(coord: Coord) -> bool:
+            dist = distances[coord[0]][coord[1]]
+            if dist is None:
+                return False
+            return dist < cat_dist
+
+        neighbors = list(filter(is_better, self.cat_neighbors()))
+        next = max(neighbors, key=route_count, default=None)
+
+        return next
 
     def print_distances(self) -> None:
         distances = self.distances_to_edge()

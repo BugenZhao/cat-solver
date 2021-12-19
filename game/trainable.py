@@ -1,6 +1,4 @@
 from typing import Tuple
-
-from numpy.lib.function_base import disp
 from .core import GameCore, Result
 import numpy as np
 
