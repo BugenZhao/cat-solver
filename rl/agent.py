@@ -1,3 +1,4 @@
+from .utils import DEVICE
 from .algorithm import DQN
 import torch
 import numpy as np
@@ -30,9 +31,9 @@ class CatAgent:
             return self.predict(obs)
 
     def predict(self, obs: np.ndarray) -> int:
-        obs = torch.tensor(obs, dtype=torch.float32)
+        obs = torch.tensor(obs, dtype=torch.float32).to(DEVICE)
         q = self.alg.predict(obs)
-        act = q.argmax().numpy()
+        act = q.argmax().cpu().numpy()
         return act
 
     def learn(self, obs, act, reward, next_obs, terminal) -> float:
@@ -44,11 +45,11 @@ class CatAgent:
         reward = np.expand_dims(reward, axis=-1)
         terminal = np.expand_dims(terminal, axis=-1)
 
-        obs = torch.tensor(obs, dtype=torch.float32)
-        act = torch.tensor(act, dtype=torch.int64)
-        reward = torch.tensor(reward, dtype=torch.float32)
-        next_obs = torch.tensor(next_obs, dtype=torch.float32)
-        terminal = torch.tensor(terminal, dtype=torch.float32)
+        obs = torch.tensor(obs, dtype=torch.float32).to(DEVICE)
+        act = torch.tensor(act, dtype=torch.int64).to(DEVICE)
+        reward = torch.tensor(reward, dtype=torch.float32).to(DEVICE)
+        next_obs = torch.tensor(next_obs, dtype=torch.float32).to(DEVICE)
+        terminal = torch.tensor(terminal, dtype=torch.float32).to(DEVICE)
 
         loss = self.alg.learn(obs, act, reward, next_obs, terminal)
         return loss
@@ -57,5 +58,5 @@ class CatAgent:
         torch.save(self.alg.model.state_dict(), save_path)
 
     def restore(self, save_path: str):
-        checkpoint = torch.load(save_path, map_location=self.alg.device)
+        checkpoint = torch.load(save_path, map_location=DEVICE)
         self.alg.model.load_state_dict(checkpoint)

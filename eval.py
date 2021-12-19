@@ -2,7 +2,6 @@ import sys
 from typing import Tuple, Union
 from game.trainable import Reward, TrainableGame
 import numpy as np
-from numpy.lib.function_base import disp
 from rl import *
 
 

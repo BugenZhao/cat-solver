@@ -8,7 +8,7 @@ Reward = float
 
 
 class TrainableGame:
-    def __init__(self, n=11) -> None:
+    def __init__(self, n: int = 11) -> None:
         self.n = n
         self.reset()
 

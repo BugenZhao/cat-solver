@@ -1,5 +1,5 @@
-from typing import Union
-from rl.model import CatModel
+from .utils import DEVICE
+from .model import CatModel
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -11,10 +11,8 @@ class DQN:
     def __init__(self, model: CatModel, gamma: float, lr: float):
         self.model = model
         self.target_model = deepcopy(model)
-        self.device = torch.device(
-            "cuda" if torch.cuda.is_available() else "cpu")
-        self.model.to(self.device)
-        self.target_model.to(self.device)
+        self.model.to(DEVICE)
+        self.target_model.to(DEVICE)
 
         self.gamma = gamma
         self.lr = lr
