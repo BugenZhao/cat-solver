@@ -8,8 +8,7 @@ authors = [
 dependencies = [
     "matplotlib",
     "setuptools",
-    "parl",
-    "paddlepaddle",
+    "torch",
 ]
 requires-python = ">=3.9"
 license = {text = "MIT"}

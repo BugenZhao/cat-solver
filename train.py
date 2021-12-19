@@ -1,12 +1,10 @@
-import os
-from algorithm import CatAgent, CatModel
+import logging
 from game.trainable import Reward, TrainableGame
 import numpy as np
-import parl
-from parl.core.fluid.agent import Agent
-from parl.utils import logger, ReplayMemory
-from parl.algorithms import DQN
 from logging import info
+from rl import *
+
+logging.basicConfig(level="INFO")
 
 LEARN_FREQ = 5  # training frequency
 MEMORY_SIZE = 200000
@@ -14,7 +12,7 @@ MEMORY_WARMUP_SIZE = 200
 BATCH_SIZE = 64
 LEARNING_RATE = 0.0005
 GAMMA = 0.99
-TRAIN_EPISODE = 1000
+TRAIN_EPISODE = 100000
 
 Env = TrainableGame
 
@@ -51,7 +49,7 @@ def eval_episode(agent: CatAgent, env: Env, episodes: int = 5) -> Reward:
 
         while True:
             obs = env.get_obs()
-            action = agent.predict()
+            action = agent.predict(obs)
             reward, _, terminal = env.step(action)
             episode_reward += reward
             if terminal:
@@ -66,7 +64,7 @@ def train():
     obs_dim = env.obs_dim()
     act_dim = env.act_dim()
 
-    rpm = ReplayMemory(MEMORY_SIZE, obs_dim, act_dim)
+    rpm = ReplayMemory(MEMORY_SIZE, obs_dim, 0)
 
     model = CatModel(obs_dim, act_dim)
     alg = DQN(model, gamma=GAMMA, lr=LEARNING_RATE)

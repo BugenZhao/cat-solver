@@ -19,13 +19,18 @@ class TrainableGame:
         return self.n ** 2
 
     def get_obs(self) -> np.ndarray:
-        return np.array(self.game.state, dtype='int8')
+        vals = []
+        for row in self.game.state:
+            for block in row:
+                vals.append(block.value)
+        return np.array(vals)
 
     def reset(self):
         self.game = GameCore(self.n, self.n, self.n - 3)
 
     def step(self, action: Act) -> Tuple[Reward, Obs, bool]:
-        i = action / self.n
+        action = Act(action)
+        i = action // self.n
         j = action % self.n
         reward = 0
         terminal = True
@@ -37,6 +42,7 @@ class TrainableGame:
         next_obs = self.get_obs()
         if self.game.result == Result.GAMING:
             terminal = False
+            reward += 1
         elif self.game.result == Result.WIN:
             reward += 100
 
