@@ -85,7 +85,10 @@ class GameCore:
         bottom_left = i + 1, j - delta
         bottom_right = i + 1, j + 1 - delta
 
-        return list(filter(self.is_valid_coord, [left, top_left, top_right, right, bottom_right, bottom_left]))
+        neighbors = list(filter(self.is_valid_coord, [
+                         left, top_left, top_right, right, bottom_right, bottom_left]))
+        random.shuffle(neighbors)
+        return neighbors
 
     def cat_neighbors(self) -> list[Coord]:
         return self.neighbors(self.cat)

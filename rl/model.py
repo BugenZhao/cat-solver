@@ -6,8 +6,8 @@ class CatModel(nn.Module):
     def __init__(self, obs_dim: int, act_dim: int):
         super(CatModel, self).__init__()
 
-        hid1_size = act_dim * 10
-        hid2_size = act_dim * 10
+        hid1_size = act_dim * 16
+        hid2_size = act_dim * 4
         self.fc1 = nn.Linear(obs_dim, hid1_size)
         self.fc2 = nn.Linear(hid1_size, hid2_size)
         self.fc3 = nn.Linear(hid2_size, act_dim)

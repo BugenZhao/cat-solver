@@ -10,7 +10,7 @@ class CatAgent:
         self.global_step = 0
         self.update_target_steps = 200
 
-        self.e_greed = 0.1
+        self.e_greed = 0.2
         self.e_greed_decr = 0.001
         self.rng = np.random.default_rng()
         self.train_mode = True
