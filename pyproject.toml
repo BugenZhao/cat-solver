@@ -23,4 +23,4 @@ requires = ["pdm-pep517"]
 build-backend = "pdm.pep517.api"
 
 [tool.pdm.scripts]
-main = {call = "main:main"}
+play = {call = "play:play"}
