@@ -6,7 +6,8 @@ from numpy.lib.function_base import disp
 from rl import *
 
 
-def eval_episode(agent: CatAgent, env: TrainableGame, episodes: int = 5, display: bool = False) -> Reward:
+def eval_episode(agent: CatAgent, env: TrainableGame, episodes: int = 10, display: bool = False) -> Reward:
+    agent.train_mode = False
     rewards = []
     for _ in range(episodes):
         env.reset()
@@ -45,6 +46,7 @@ def load_model(path: Union[str, None], gamma: float = 1.0, lr: float = 0.0) -> T
 
     if path is not None:
         agent.restore(path)
+        agent.e_greed = 0.0
 
     return agent, env
 

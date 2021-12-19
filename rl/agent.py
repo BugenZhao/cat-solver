@@ -13,15 +13,21 @@ class CatAgent:
         self.e_greed = 0.1
         self.e_greed_decr = 0.001
         self.rng = np.random.default_rng()
+        self.train_mode = True
 
     def sample(self, obs: np.ndarray) -> int:
-        if self.rng.uniform() < self.e_greed:
-            # exploration
-            act = self.rng.integers(self.act_dim)
+        if self.train_mode:
+            if self.rng.uniform() < self.e_greed:
+                # exploration
+                act = self.rng.integers(self.act_dim)
+            else:
+                # exploitation
+                act = self.predict(obs)
+            self.e_greed = max(0.001, self.e_greed - self.e_greed_decr)
+            return act
         else:
-            act = self.predict(obs)
-        self.e_greed = max(0.001, self.e_greed - self.e_greed_decr)
-        return act
+            # exploitation
+            return self.predict(obs)
 
     def predict(self, obs: np.ndarray) -> int:
         obs = torch.tensor(obs, dtype=torch.float32)

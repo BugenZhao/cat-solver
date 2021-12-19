@@ -22,6 +22,7 @@ MODEL_DIR = "models"
 
 
 def train_episode(agent: CatAgent, env: TrainableGame, rpm: ReplayMemory):
+    agent.train_mode = True
     env.reset()
     total_reward = 0
     step = 0
