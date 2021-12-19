@@ -1,6 +1,7 @@
 import logging
 import os
-from eval import eval_episode
+import sys
+from eval import eval_episode, load_model
 from game.trainable import TrainableGame
 import numpy as np
 from logging import info
@@ -45,16 +46,11 @@ def train_episode(agent: CatAgent, env: TrainableGame, rpm: ReplayMemory):
 
 
 def train():
-    os.makedirs(MODEL_DIR)
-    env = TrainableGame()
-    obs_dim = env.obs_dim()
-    act_dim = env.act_dim()
+    os.makedirs(MODEL_DIR, exist_ok=True)
 
-    rpm = ReplayMemory(MEMORY_SIZE, obs_dim, 0)
-
-    model = CatModel(obs_dim, act_dim)
-    alg = DQN(model, gamma=GAMMA, lr=LEARNING_RATE)
-    agent = CatAgent(alg, act_dim)
+    checkpoint_path = sys.argv[1] if len(sys.argv) == 2 else None
+    agent, env = load_model(checkpoint_path, gamma=GAMMA, lr=LEARNING_RATE)
+    rpm = ReplayMemory(MEMORY_SIZE, env.obs_dim(), 0)
 
     while len(rpm) < MEMORY_WARMUP_SIZE:
         train_episode(agent, env, rpm)

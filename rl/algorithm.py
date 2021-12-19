@@ -8,7 +8,7 @@ from copy import deepcopy
 
 
 class DQN:
-    def __init__(self, model: CatModel, gamma: float = 1.0, lr: float = 0.0):
+    def __init__(self, model: CatModel, gamma: float, lr: float):
         self.model = model
         self.target_model = deepcopy(model)
         self.device = torch.device(

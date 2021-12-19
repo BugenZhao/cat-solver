@@ -1,4 +1,5 @@
 import sys
+from typing import Tuple, Union
 from game.trainable import Reward, TrainableGame
 import numpy as np
 from numpy.lib.function_base import disp
@@ -33,20 +34,27 @@ def eval_episode(agent: CatAgent, env: TrainableGame, episodes: int = 5, display
     return np.mean(rewards)
 
 
-def eval():
-    if len(sys.argv) != 2:
-        print(f'usage: {sys.argv[0]} <model-path>')
-        exit(1)
-    path = sys.argv[1]
-
+def load_model(path: Union[str, None], gamma: float = 1.0, lr: float = 0.0) -> Tuple[CatAgent, TrainableGame]:
     env = TrainableGame()
     obs_dim = env.obs_dim()
     act_dim = env.act_dim()
 
     model = CatModel(obs_dim, act_dim)
-    alg = DQN(model)
+    alg = DQN(model, gamma=gamma, lr=lr)
     agent = CatAgent(alg, act_dim)
-    agent.restore(path)
+
+    if path is not None:
+        agent.restore(path)
+
+    return agent, env
+
+
+def eval():
+    if len(sys.argv) != 2:
+        print(f'usage: {sys.argv[0]} <model-path>')
+        exit(1)
+    path = sys.argv[1]
+    agent, env = load_model(path)
 
     print("evaluating...")
     reward = eval_episode(agent, env, episodes=1000)
